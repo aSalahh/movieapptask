@@ -8,6 +8,9 @@ import android.view.View;
 import com.sala7.movieapptask.R;
 import com.sala7.movieapptask.databinding.ActivityMainBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding activityMainBinding;
 
