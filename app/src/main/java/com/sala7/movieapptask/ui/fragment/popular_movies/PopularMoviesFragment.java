@@ -1,66 +1,126 @@
 package com.sala7.movieapptask.ui.fragment.popular_movies;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sala7.movieapptask.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PopularMoviesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class PopularMoviesFragment extends Fragment {
+import com.sala7.movieapptask.databinding.FragmentPopularMoviesBinding;
+import com.sala7.movieapptask.pojo.model.Movie;
+import com.sala7.movieapptask.ui.fragment.popular_movies.adapter.MoviesAdapter;
+import com.sala7.movieapptask.ui.fragment.popular_movies.interfaces.MovieListener;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
+public class PopularMoviesFragment extends Fragment implements MovieListener {
+
+    private final List<Movie> tvShowList = new ArrayList<>();
+    @Inject
+    MoviesAdapter moviesAdapter;
+    boolean isLoading = false;
+    boolean isLoadingMore = false;
+    private FragmentPopularMoviesBinding fragmentPopularMoviesBinding;
+    private PopularMoviesViewModel popularMoviesViewModel;
+    private int currentPage = 1;
+    private int totalAvailablePages = 1;
 
     public PopularMoviesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PopularMoviesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PopularMoviesFragment newInstance(String param1, String param2) {
-        PopularMoviesFragment fragment = new PopularMoviesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        fragmentPopularMoviesBinding = FragmentPopularMoviesBinding.inflate(getLayoutInflater());
+        return fragmentPopularMoviesBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initialization();
+
+
+    }
+
+    private void initialization() {
+        fragmentPopularMoviesBinding.moviesRecyclerview.setHasFixedSize(true);
+        popularMoviesViewModel = new ViewModelProvider(this).get(PopularMoviesViewModel.class);
+        moviesAdapter = new MoviesAdapter();
+        moviesAdapter.setList(tvShowList, this);
+        fragmentPopularMoviesBinding.moviesRecyclerview.setAdapter(moviesAdapter);
+        fragmentPopularMoviesBinding.moviesRecyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (!fragmentPopularMoviesBinding.moviesRecyclerview.canScrollVertically(1)) {
+                    if (currentPage <= totalAvailablePages) {
+                        currentPage += 1;
+                        //for get new list
+                        getMostPopularTVShows();
+                    }
+                }
+            }
+        });
+        getMostPopularTVShows();
+    }
+
+    private void getMostPopularTVShows() {
+        toggleLoading();
+        popularMoviesViewModel.getMostPopularMovies(currentPage).observe(requireActivity(), mostPopularMoviesResponse -> {
+                    toggleLoading();
+                    if (mostPopularMoviesResponse != null) {
+                        totalAvailablePages = mostPopularMoviesResponse.getTotalPages();
+                        if ((mostPopularMoviesResponse.getResults() != null)) {
+                            int oldCount = tvShowList.size();
+                            tvShowList.addAll(mostPopularMoviesResponse.getResults());
+
+                            moviesAdapter.notifyItemRangeInserted(oldCount, tvShowList.size());
+
+                        }
+                    }
+                }
+
+        );
+    }
+
+    private void toggleLoading() {
+        if (currentPage == 1) {
+            if (isLoading) {
+                fragmentPopularMoviesBinding.isLoading.setVisibility(View.GONE);
+                isLoading = false;
+            } else {
+                fragmentPopularMoviesBinding.isLoading.setVisibility(View.VISIBLE);
+                isLoading = true;
+            }
+        } else {
+
+            if (isLoadingMore) {
+                fragmentPopularMoviesBinding.isLoadingMore.setVisibility(View.GONE);
+                isLoadingMore = false;
+            } else {
+                fragmentPopularMoviesBinding.isLoadingMore.setVisibility(View.VISIBLE);
+                isLoadingMore = true;
+            }
+
+
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_popular_movies, container, false);
+    public void onMovieClicked(Movie movie) {
+
+
     }
 }
