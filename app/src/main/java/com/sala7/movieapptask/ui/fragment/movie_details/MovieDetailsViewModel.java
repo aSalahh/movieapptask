@@ -21,7 +21,7 @@ public class MovieDetailsViewModel extends ViewModel {
     }
 
 
-    public LiveData<MovieDetailsResponse> getMostPopularMovies(int page) {
+    public LiveData<MovieDetailsResponse> getMovieDetails(int page) {
         return movieDetailsRepository.getMovieDetails(page);
     }
 }
