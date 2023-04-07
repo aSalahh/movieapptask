@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sala7.movieapptask.databinding.FragmentPopularMoviesBinding;
@@ -67,7 +69,6 @@ public class PopularMoviesFragment extends Fragment implements MovieListener {
                 if (!fragmentPopularMoviesBinding.moviesRecyclerview.canScrollVertically(1)) {
                     if (currentPage <= totalAvailablePages) {
                         currentPage += 1;
-                        //for get new list
                         getMostPopularTVShows();
                     }
                 }
@@ -120,7 +121,7 @@ public class PopularMoviesFragment extends Fragment implements MovieListener {
 
     @Override
     public void onMovieClicked(Movie movie) {
-
-
+        NavDirections direction = PopularMoviesFragmentDirections.actionPopularMoviesFragmentToMovieDetailsFragment(movie.getId());
+        Navigation.findNavController(requireView()).navigate((NavDirections) direction);
     }
 }

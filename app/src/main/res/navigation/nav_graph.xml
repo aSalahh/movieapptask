@@ -25,5 +25,9 @@
         <argument
             android:name="movie_id"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_movieDetailsFragment_pop_including_popularMoviesFragment"
+            app:popUpTo="@id/popularMoviesFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
