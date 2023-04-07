@@ -1,6 +1,8 @@
 package com.sala7.movieapptask.ui.fragment.movie_details;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,8 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
-import com.google.android.material.button.MaterialButton;
 import com.sala7.movieapptask.R;
 import com.sala7.movieapptask.databinding.FragmentMovieDetailsBinding;
 import com.sala7.movieapptask.utills.Constants;
@@ -47,9 +50,17 @@ public class MovieDetailsFragment extends Fragment {
     }
 
     private void initialization() {
+        assert getArguments() != null;
         args = MovieDetailsFragmentArgs.fromBundle(getArguments());
         int movieId = args.getMovieId();
         movieDetailsViewModel = new ViewModelProvider(this).get(MovieDetailsViewModel.class);
+        fragmentMovieDetailsBinding.imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavDirections direction = MovieDetailsFragmentDirections.actionMovieDetailsFragmentToPopularMoviesFragment();
+                Navigation.findNavController(requireView()).navigate((NavDirections) direction);
+            }
+        });
         getMovieDetails(movieId);
 
     }
@@ -70,10 +81,15 @@ public class MovieDetailsFragment extends Fragment {
                 fragmentMovieDetailsBinding.textOriginalLanguage.setText(movieDetailsResponse.getOriginalLanguage());
                 fragmentMovieDetailsBinding.textReleasedDate.setText(movieDetailsResponse.getReleaseDate());
                 fragmentMovieDetailsBinding.textTagline.setText(movieDetailsResponse.getTagline());
-                fragmentMovieDetailsBinding.buttonWebsite.addOnCheckedChangeListener(new MaterialButton.OnCheckedChangeListener() {
+                fragmentMovieDetailsBinding.buttonWebsite.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCheckedChanged(MaterialButton button, boolean isChecked) {
-                        //TODO implement navigation to website
+                    public void onClick(View view) {
+                        String url = movieDetailsResponse.getHomepage();
+                        if (url != null) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                        }
+
                     }
                 });
                 fragmentMovieDetailsBinding.textRuntime.setText(movieDetailsResponse.getRuntime() + " Min");
