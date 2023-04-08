@@ -9,6 +9,7 @@
         android:id="@+id/popularMoviesFragment"
         android:name="com.sala7.movieapptask.ui.fragment.popular_movies.PopularMoviesFragment"
         android:label="fragment_popular_movies"
+
         tools:layout="@layout/fragment_popular_movies" >
         <action
             android:id="@+id/action_popularMoviesFragment_to_movieDetailsFragment"

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,10 +14,12 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sala7.movieapptask.R;
 import com.sala7.movieapptask.databinding.FragmentPopularMoviesBinding;
 import com.sala7.movieapptask.pojo.model.Movie;
 import com.sala7.movieapptask.ui.fragment.popular_movies.adapter.MoviesAdapter;
 import com.sala7.movieapptask.ui.fragment.popular_movies.interfaces.MovieListener;
+import com.sala7.movieapptask.utills.Helper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,10 +53,18 @@ public class PopularMoviesFragment extends Fragment implements MovieListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initialization();
+        if (Helper.isNetworkAvailable(requireActivity())) {
+            initialization();
+
+        } else {
+            Toast.makeText(getActivity(), R.string.no_internet_connection, Toast.LENGTH_LONG).show();
+        }
+
 
 
     }
+
+
 
     private void initialization() {
         fragmentPopularMoviesBinding.moviesRecyclerview.setHasFixedSize(true);

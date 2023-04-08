@@ -15,7 +15,7 @@ import retrofit2.Response;
 
 public class PopularMoviesRepository {
     private final MoviesApiService moviesApiService;
-    private final MutableLiveData<PopularMoviesResponse> tvShowResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<PopularMoviesResponse> popularMoviesResponseMutableLiveData = new MutableLiveData<>();
 
 
     @Inject
@@ -27,15 +27,15 @@ public class PopularMoviesRepository {
         moviesApiService.getPopularMoviesList(page).enqueue(new Callback<PopularMoviesResponse>() {
             @Override
             public void onResponse(@NonNull Call<PopularMoviesResponse> call, @NonNull Response<PopularMoviesResponse> response) {
-                tvShowResponseMutableLiveData.setValue(response.body());
+                popularMoviesResponseMutableLiveData.setValue(response.body());
             }
 
             @Override
             public void onFailure(@NonNull Call<PopularMoviesResponse> call, @NonNull Throwable t) {
-                tvShowResponseMutableLiveData.setValue(null);
+                popularMoviesResponseMutableLiveData.setValue(null);
             }
         });
-        return tvShowResponseMutableLiveData;
+        return popularMoviesResponseMutableLiveData;
     }
 
 
