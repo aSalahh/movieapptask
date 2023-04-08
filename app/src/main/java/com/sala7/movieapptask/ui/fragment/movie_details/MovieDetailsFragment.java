@@ -8,7 +8,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.sala7.movieapptask.R;
 import com.sala7.movieapptask.databinding.FragmentMovieDetailsBinding;
 import com.sala7.movieapptask.utills.Constants;
+import com.sala7.movieapptask.utills.Helper;
 import com.squareup.picasso.Picasso;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -44,7 +47,19 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initialization();
+        if (Helper.isNetworkAvailable(requireActivity())) {
+            initialization();
+
+        } else {
+            Toast.makeText(getActivity(), R.string.no_internet_connection, Toast.LENGTH_LONG).show();
+        }
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                NavDirections direction = MovieDetailsFragmentDirections.actionMovieDetailsFragmentToPopularMoviesFragment();
+                Navigation.findNavController(requireView()).navigate(direction);
+            }
+        });
 
 
     }
@@ -58,7 +73,7 @@ public class MovieDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 NavDirections direction = MovieDetailsFragmentDirections.actionMovieDetailsFragmentToPopularMoviesFragment();
-                Navigation.findNavController(requireView()).navigate((NavDirections) direction);
+                Navigation.findNavController(requireView()).navigate(direction);
             }
         });
         getMovieDetails(movieId);
